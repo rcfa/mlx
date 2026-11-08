@@ -319,13 +319,13 @@ void reduction_op(
       }
       if (size > sum_block) {
         for (int i = 0; i < out.size(); i++, out_ptr++) {
-          int offset = elem_to_loc(i, shape, strides);
+          int64_t offset = elem_to_loc(i, shape, strides);
           // The first block goes into val, each later block into block from 0.
           U val = init;
           U block = U(0);
-          int count = 0;
+          int64_t count = 0;
           nd_loop(
-              [&](int extra_offset) {
+              [&](int64_t extra_offset) {
                 U& acc = count < sum_block ? val : block;
                 acc = Op{}(acc, *(in_ptr + offset + extra_offset));
                 if (++count > sum_block && count % sum_block == 0) {
