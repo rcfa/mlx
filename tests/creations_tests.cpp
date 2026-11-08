@@ -178,9 +178,11 @@ enum class Mode { eager, simd, copy, compiled };
 // converted one value at a time.
 template <typename S, typename T>
 bool simd_converts(const array& x, const array& expected) {
-  // macOS headers also declare a global simd and bfloat16_t.
+  // macOS headers also declare a global simd and bfloat16_t, arm_neon.h a
+  // global float16_t.
   namespace simd = mlx::core::simd;
   using mlx::core::bfloat16_t;
+  using mlx::core::float16_t;
   constexpr bool half =
       std::is_same_v<S, float16_t> || std::is_same_v<S, bfloat16_t>;
   constexpr int N = half ? 1 : std::min(simd::max_size<S>, simd::max_size<T>);
@@ -259,7 +261,7 @@ void check_float_to_int(const std::vector<CastRow<T>>& rows, Mode mode) {
     if (mode == Mode::simd) {
       eval(x, expected);
       if (src == float16) {
-        CHECK(simd_converts<float16_t, T>(x, expected));
+        CHECK(simd_converts<mlx::core::float16_t, T>(x, expected));
       } else if (src == bfloat16) {
         CHECK(simd_converts<mlx::core::bfloat16_t, T>(x, expected));
       } else if (src == float32) {
